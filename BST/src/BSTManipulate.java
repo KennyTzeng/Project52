@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -22,10 +23,12 @@ public class BSTManipulate extends JFrame{
 	private JButton printButton;
 	private JButton rebalanceButton;
 	private JButton clearButton;
+	private JScrollPane scrollPane;
 	private JTextArea outputArea;
 	
 	private BSTNode root = null;
 	private BSTNode dNode = null;
+	// P for Parent
 	private BSTNode dPNode = null;
 	private Stack<Integer> searchStack = new Stack<Integer>();
 
@@ -61,7 +64,8 @@ public class BSTManipulate extends JFrame{
 		add(controlPanel, BorderLayout.NORTH);
 		outputArea = new JTextArea();
 		outputArea.setEditable(false);
-		add(outputArea, BorderLayout.CENTER);
+		scrollPane = new JScrollPane(outputArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		add(scrollPane, BorderLayout.CENTER);
 		
 		ButtonHandler ButtonHandler = new ButtonHandler();
 		addButton.addActionListener(ButtonHandler);
@@ -251,7 +255,7 @@ public class BSTManipulate extends JFrame{
 	public void delete(){
 		if(dNode.getLeftNode() == null && dNode.getRightNode() == null){
 			if(dPNode != null){
-				if(dPNode.getLeftNode().getValue() == dNode.getValue()){
+				if(dPNode.getLeftNode() != null && dPNode.getLeftNode().getValue() == dNode.getValue()){
 					dPNode.setLeftNode(null);
 				}else{
 					dPNode.setRightNode(null);
@@ -259,12 +263,73 @@ public class BSTManipulate extends JFrame{
 			}else{
 				root = null;
 			}
-		}else if(dNode.getLeftNode() == null){
-			
 		}else if(dNode.getRightNode() == null){
-			
+			if(dPNode == null){
+				root = dNode.getLeftNode();
+			}else{
+				BSTNode dLink = dNode.getLeftNode();
+				BSTNode current = dNode.getLeftNode();
+				BSTNode pCurrent = dNode;
+				while(current.getRightNode() != null){
+					pCurrent = current;
+					current = current.getRightNode();
+				}
+				if(current.getValue() == dLink.getValue()){
+					if(dPNode.getLeftNode() != null && dPNode.getLeftNode().getValue() == dNode.getValue()){
+						dPNode.setLeftNode(current);
+					}else{
+						dPNode.setRightNode(current);
+					}
+				}else{
+					if(current.getLeftNode() == null){
+						pCurrent.setRightNode(null);
+					}else{
+						pCurrent.setRightNode(current.getLeftNode());
+					}
+					if(dPNode.getLeftNode() != null && dPNode.getLeftNode().getValue() == dNode.getValue()){
+						dPNode.setLeftNode(current);
+					}else{
+						dPNode.setRightNode(current);
+					}
+					current.setLeftNode(dLink);
+				}
+			}
+		// else if( dNode.getLeftNode() == null ) && else
 		}else{
-			
+			BSTNode dLink = dNode.getRightNode();
+			BSTNode current = dNode.getRightNode();
+			BSTNode pCurrent = dNode;
+			while(current.getLeftNode() != null){
+				pCurrent = current;
+				current = current.getLeftNode();
+			}
+			if(current.getValue() == dLink.getValue()){
+				if(dPNode == null){
+					root = current;
+				}else if(dPNode.getLeftNode() != null && dPNode.getLeftNode().getValue() == dNode.getValue()){
+					dPNode.setLeftNode(current);
+				}else{
+					dPNode.setRightNode(current);
+				}
+			}else{
+				if(current.getRightNode() == null){
+					pCurrent.setLeftNode(null);
+				}else{
+					pCurrent.setLeftNode(current.getRightNode());
+				}
+				
+				if(dPNode == null){
+					root = current;
+				}else if(dPNode.getLeftNode() != null && dPNode.getLeftNode().getValue() == dNode.getValue()){
+					dPNode.setLeftNode(current);
+				}else{
+					dPNode.setRightNode(current);
+				}
+				current.setRightNode(dLink);
+			}
+			if(dNode.getLeftNode() != null){
+				current.setLeftNode(dNode.getLeftNode());
+			}
 		}
 	}
 	
