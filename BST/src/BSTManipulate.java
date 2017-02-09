@@ -25,6 +25,8 @@ public class BSTManipulate extends JFrame{
 	private JTextArea outputArea;
 	
 	private BSTNode root = null;
+	private BSTNode dNode = null;
+	private BSTNode dPNode = null;
 	private Stack<Integer> searchStack = new Stack<Integer>();
 
 	public static void main(String[] args) {
@@ -76,6 +78,7 @@ public class BSTManipulate extends JFrame{
 		public void actionPerformed(ActionEvent event) {
 			// TODO Auto-generated method stub
 			if(event.getSource().equals(addButton)){
+				
 				try{
 					int inputValue = Integer.parseInt(addField.getText().trim());
 					if(root == null){
@@ -96,9 +99,36 @@ public class BSTManipulate extends JFrame{
 				}
 				addField.setText("");
 				addField.requestFocus();
+				
 			}else if(event.getSource().equals(deleteButton)){
 				
+				if(root == null){
+					JOptionPane.showMessageDialog(BSTManipulate.this, "The tree is empty!", "Alert", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				try{
+					int inputValue = Integer.parseInt(deleteField.getText().trim());
+					outputArea.append("Attempt to delete the Value : "+inputValue+"\n");
+					if(search(inputValue)){
+						delete();
+						outputArea.append("Node : "+inputValue+" has been deleted\n");
+					}else{
+						outputArea.append("The Node : "+inputValue+" is not exists\n");
+					}
+				}catch(NumberFormatException e){
+					JOptionPane.showMessageDialog(BSTManipulate.this, "InputValue is connot format to Integer", "Alert", JOptionPane.ERROR_MESSAGE);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				deleteField.setText("");
+				deleteField.requestFocus();
+				
 			}else if(event.getSource().equals(searchButton)){
+				
+				if(root == null){
+					JOptionPane.showMessageDialog(BSTManipulate.this, "The tree is empty!", "Alert", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				try{
 					int inputValue = Integer.parseInt(JOptionPane.showInputDialog(BSTManipulate.this, "Enter the value you want to search", "Search", JOptionPane.QUESTION_MESSAGE).trim());
 					outputArea.append("Attempt to find the Value : "+inputValue+"\n");
@@ -116,7 +146,9 @@ public class BSTManipulate extends JFrame{
 				}catch(Exception e){
 					System.out.println("cancel the search function");
 				}
+				
 			}else if(event.getSource().equals(printButton)){
+				
 				if(root == null){
 					JOptionPane.showMessageDialog(BSTManipulate.this, "The tree is empty!", "Alert", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -150,9 +182,15 @@ public class BSTManipulate extends JFrame{
 				}catch(Exception e){
 					System.out.println("cancel the print function");
 				}
+				
 			}else if(event.getSource().equals(rebalanceButton)){
 				
 			}else if(event.getSource().equals(clearButton)){
+				
+				root = null;
+				JOptionPane.showMessageDialog(BSTManipulate.this, "The tree has been cleared", "Clear", JOptionPane.INFORMATION_MESSAGE);
+				outputArea.append("The tree has been cleared\n");
+				outputArea.append("-------------------------------------\n");
 				
 			}
 		}
@@ -162,8 +200,11 @@ public class BSTManipulate extends JFrame{
 	public boolean search(int value){
 		BSTNode current = root;
 		searchStack = new Stack<Integer>();
+		dNode = null;
+		dPNode = null;
 		while(true){
 			if(current.getValue() == value){
+				dNode = current;
 				return true;
 			}
 			if(value < current.getValue()){
@@ -171,6 +212,7 @@ public class BSTManipulate extends JFrame{
 					return false;
 				}else{
 					searchStack.push(current.getValue());
+					dPNode = current;
 					current = current.getLeftNode();
 				}
 			}else if(value > current.getValue()){
@@ -178,6 +220,7 @@ public class BSTManipulate extends JFrame{
 					return false;
 				}else{
 					searchStack.push(current.getValue());
+					dPNode = current;
 					current = current.getRightNode();
 				}
 			}
@@ -202,6 +245,26 @@ public class BSTManipulate extends JFrame{
 					current = current.getRightNode();
 				}
 			}
+		}
+	}
+	
+	public void delete(){
+		if(dNode.getLeftNode() == null && dNode.getRightNode() == null){
+			if(dPNode != null){
+				if(dPNode.getLeftNode().getValue() == dNode.getValue()){
+					dPNode.setLeftNode(null);
+				}else{
+					dPNode.setRightNode(null);
+				}
+			}else{
+				root = null;
+			}
+		}else if(dNode.getLeftNode() == null){
+			
+		}else if(dNode.getRightNode() == null){
+			
+		}else{
+			
 		}
 	}
 	
